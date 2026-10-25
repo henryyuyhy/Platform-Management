@@ -1,0 +1,99 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0.146'
+    id 'idea'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    // Create 官方 maven（编译期只需要 create-<mcver> 这一个 artifact）。
+    maven {
+        name = 'CreateMod'
+        url = 'https://maven.createmod.net/'
+    }
+    // Registrate 的发布仓库（dev 端运行 Create 时需要；不进产物）。
+    maven {
+        name = 'DevosOneReleases'
+        url = 'https://mvn.devos.one/releases/'
+    }
+}
+
+dependencies {
+    // 编译期依赖：运行时由玩家/服务器已安装的 Create 提供，绝不打包。
+    // transitive = false：我们只用到 Create 自带类，不需要它的传递依赖（catnip 等）。
+    compileOnly("com.simibubi.create:create-${minecraft_version}:${create_version}") {
+        transitive = false
+    }
+    // StationBlockEntity 的父类实现了 Ponder 的 VirtualBlockEntity 接口，javac 需要它才能解析类层级。
+    compileOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}") {
+        transitive = false
+    }
+
+    // 仅开发环境（runClient / runServer）用：把 Create 及其运行时依赖装进 dev 端，方便游戏内自测。
+    // runtimeOnly 不进发布 jar，也不影响编译。
+    runtimeOnly("com.simibubi.create:create-${minecraft_version}:${create_version}") {
+        transitive = false
+    }
+    runtimeOnly("net.createmod.ponder:ponder-neoforge:${ponder_version}")
+    runtimeOnly("dev.engine-room.flywheel:flywheel-neoforge-${minecraft_version}:${flywheel_version}")
+    runtimeOnly("com.tterrag.registrate:Registrate:${registrate_version}")
+}
+
+neoForge {
+    version = project.neo_version
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+        data {
+            data()
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+// runData 输出挂进资源源集，随 jar 打包（勿手动改 generated 文件）。
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// 只在 neoforge.mods.toml 上做占位符展开，其它资源文件原样复制。
+// 注意：expand 底层是 Groovy 模板引擎，会把它看到的任何“美元号+花括号”片段
+// 当作表达式求值——资源文件里出现非占位符的该类写法会让构建以模板解析失败报错。
+processResources {
+    // 元数据全部来自 gradle.properties：不声明成输入的话，只改版本号/显示名时 Gradle 会判定
+    // 本任务 UP-TO-DATE，把上次展开好的 toml 原样塞进新 jar（文件名变了、里面版本号没变）。
+    inputs.file('gradle.properties')
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand project.properties
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : mod_id,
+                "Specification-Vendor"    : mod_authors,
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : mod_authors,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "createplatform.station.platform": "Platform",
+  "createplatform.station.platform.none": "unset",
+  "createplatform.schedule.platform.tip": "Platform filter",
+  "createplatform.schedule.platform.tip1": "Leave empty to stop at any platform",
+  "createplatform.schedule.platform.tip2": "Comma-separated, e.g. 1,2",
+  "createplatform.schedule.platform_tooltip": "Platforms: %s",
+  "createplatform.schedule.summary_suffix": " #%s"
+}

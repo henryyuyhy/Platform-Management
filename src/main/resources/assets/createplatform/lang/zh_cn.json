@@ -1,0 +1,9 @@
+{
+  "createplatform.station.platform": "站台",
+  "createplatform.station.platform.none": "未设置",
+  "createplatform.schedule.platform.tip": "站台限制",
+  "createplatform.schedule.platform.tip1": "留空 = 全部站台都能停靠",
+  "createplatform.schedule.platform.tip2": "多个站台用逗号分隔，如 1,2",
+  "createplatform.schedule.platform_tooltip": "站台限制: %s",
+  "createplatform.schedule.summary_suffix": " #%s"
+}

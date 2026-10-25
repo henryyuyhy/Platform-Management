@@ -1,0 +1,21 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "com.henry.createplatform.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "GlobalStationMixin",
+    "DestinationInstructionMixin",
+    "TextScheduleInstructionTooltipMixin"
+  ],
+  "client": [
+    "ScreenMixin",
+    "AbstractStationScreenMixin",
+    "StationScreenMixin",
+    "ScheduleScreenMixin",
+    "TextScheduleInstructionMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
